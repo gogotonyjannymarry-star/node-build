@@ -21,6 +21,8 @@ jobs:
           cd /tmp/node-v24.18.0
           export CC=arm-linux-gnueabihf-gcc
           export CXX=arm-linux-gnueabihf-g++
+          export CC_host=gcc
+          export CXX_host=g++
           export AR=arm-linux-gnueabihf-ar
           export STRIP=arm-linux-gnueabihf-strip
           ./configure --dest-cpu=arm --dest-os=linux \
