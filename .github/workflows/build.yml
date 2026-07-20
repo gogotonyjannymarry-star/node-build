@@ -20,10 +20,10 @@ jobs:
               gcc g++ python3.9 pkg-config patch
 
             add-apt-repository ppa:ubuntu-toolchain-r/test -y
-            apt update && DEBIAN_FRONTEND=noninteractive apt install -y g++-12
+            apt update && DEBIAN_FRONTEND=noninteractive apt install -y g++-11
 
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 60
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 60
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 60
 
             curl -sL https://nodejs.org/dist/v24.18.0/node-v24.18.0.tar.xz \
               -o /tmp/node.tar.xz
@@ -32,7 +32,7 @@ jobs:
 
             ./configure --python=python3.9 \
               --without-intl --without-snapshot
-            make -j2
+            make -j4
 
             cp /tmp/node-v24.18.0/out/Release/node /opt/out/
             cd /opt/out && tar -czf node-v24-armv7l.tar.gz node
