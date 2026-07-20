@@ -16,14 +16,15 @@ jobs:
           docker run --rm --platform linux/arm/v7 \
             -v /tmp/out:/opt/out ubuntu:20.04 bash -c "
             apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-              curl xz-utils make gcc g++ python3
+              curl xz-utils make gcc g++ python3.9
 
             curl -sL https://nodejs.org/dist/v24.18.0/node-v24.18.0.tar.xz \
               -o /tmp/node.tar.xz
             tar -xJf /tmp/node.tar.xz -C /tmp
             cd /tmp/node-v24.18.0
 
-            ./configure --without-intl --without-snapshot
+            ./configure --python=python3.9 \
+              --without-intl --without-snapshot
             make -j2
 
             cp /tmp/node-v24.18.0/out/Release/node /opt/out/
