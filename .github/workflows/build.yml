@@ -16,7 +16,14 @@ jobs:
           docker run --rm --platform linux/arm/v7 \
             -v /tmp/out:/opt/out ubuntu:20.04 bash -c "
             apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-              curl xz-utils make gcc g++ python3.9
+              software-properties-common curl xz-utils make \
+              gcc g++ python3.9 pkg-config patch
+
+            add-apt-repository ppa:ubuntu-toolchain-r/test -y
+            apt update && DEBIAN_FRONTEND=noninteractive apt install -y g++-12
+
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 60
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 60
 
             curl -sL https://nodejs.org/dist/v24.18.0/node-v24.18.0.tar.xz \
               -o /tmp/node.tar.xz
