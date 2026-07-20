@@ -31,8 +31,7 @@ jobs:
             cd /tmp/node-v24.18.0
 
             ./configure --python=python3.9 \
-              --without-intl --without-snapshot
-            export CXXFLAGS="-Wno-unused-result"
+              --without-intl --without-snapshot --without-ada
             make -j4
 
             cp /tmp/node-v24.18.0/out/Release/node /opt/out/
