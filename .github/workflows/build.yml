@@ -7,10 +7,14 @@ jobs:
     steps:
       - name: Set up QEMU for ARM emulation
         uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm
 
       - name: Build Node.js in arm32v7 container
         run: |
-          docker run --rm -v /tmp/out:/opt/out arm32v7/ubuntu:22.04 bash -c "
+          mkdir -p /tmp/out
+          docker run --rm --platform linux/arm/v7 \
+            -v /tmp/out:/opt/out ubuntu:20.04 bash -c "
             apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
               curl xz-utils make gcc g++ python3
 
@@ -20,12 +24,10 @@ jobs:
             cd /tmp/node-v24.18.0
 
             ./configure --without-intl --without-snapshot
-            make -j4
+            make -j2
 
-            mkdir -p /opt/out
             cp /tmp/node-v24.18.0/out/Release/node /opt/out/
-            cd /opt/out && tar -czf /tmp/node-v24-armv7l.tar.gz node
-            cp /tmp/node-v24-armv7l.tar.gz /opt/out/
+            cd /opt/out && tar -czf node-v24-armv7l.tar.gz node
           "
 
       - name: Upload artifact
