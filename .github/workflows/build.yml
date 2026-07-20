@@ -32,6 +32,7 @@ jobs:
 
             ./configure --python=python3.9 \
               --without-intl --without-snapshot
+            export CXXFLAGS="-Wno-unused-result"
             make -j4
 
             cp /tmp/node-v24.18.0/out/Release/node /opt/out/
