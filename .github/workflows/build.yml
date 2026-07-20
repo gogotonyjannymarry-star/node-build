@@ -1,0 +1,40 @@
+name: Build Node.js for armv7l
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install cross-compiler
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
+            python3 make curl xz-utils
+
+      - name: Download Node.js v24.18.0 source
+        run: |
+          curl -sL https://nodejs.org/dist/v24.18.0/node-v24.18.0.tar.xz -o /tmp/node.tar.xz
+          tar -xJf /tmp/node.tar.xz -C /tmp
+
+      - name: Cross-compile for armv7l
+        run: |
+          cd /tmp/node-v24.18.0
+          export CC=arm-linux-gnueabihf-gcc
+          export CXX=arm-linux-gnueabihf-g++
+          export AR=arm-linux-gnueabihf-ar
+          export STRIP=arm-linux-gnueabihf-strip
+          ./configure --dest-cpu=arm --dest-os=linux \
+            --cross-compiling --without-intl --without-snapshot
+          make -j$(nproc)
+
+      - name: Package binary
+        run: |
+          mkdir -p /tmp/out
+          cp /tmp/node-v24.18.0/out/Release/node /tmp/out/
+          cd /tmp/out && tar -czf /tmp/node-v24.18.0-armv7l.tar.gz node
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-v24-armv7l
+          path: /tmp/node-v24.18.0-armv7l.tar.gz
