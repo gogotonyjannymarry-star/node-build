@@ -1,0 +1,45 @@
+name: Build Node.js for armv7l
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU for ARM emulation
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm
+
+      - name: Build Node.js in arm32v7 container
+        run: |
+          mkdir -p /tmp/out
+          docker run --rm --platform linux/arm/v7 \
+            -v /tmp/out:/opt/out ubuntu:20.04 bash -c "
+            apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
+              software-properties-common curl xz-utils make \
+              gcc g++ python3.9 pkg-config patch
+
+            add-apt-repository ppa:ubuntu-toolchain-r/test -y
+            apt update && DEBIAN_FRONTEND=noninteractive apt install -y g++-11
+
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 60
+
+            curl -sL https://nodejs.org/dist/v24.18.0/node-v24.18.0.tar.xz \
+              -o /tmp/node.tar.xz
+            tar -xJf /tmp/node.tar.xz -C /tmp
+            cd /tmp/node-v24.18.0
+
+            ./configure --python=python3.9 \
+              --without-intl --without-snapshot --without-ada
+            make -j2
+
+            cp /tmp/node-v24.18.0/out/Release/node /opt/out/
+            cd /opt/out && tar -czf node-v24-armv7l.tar.gz node
+          "
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-v24-armv7l
+          path: /tmp/out/node-v24-armv7l.tar.gz
